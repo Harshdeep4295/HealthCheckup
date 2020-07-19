@@ -9,6 +9,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<Widget> _list = [];
+  static bool needToShowAllData = false;
+  bool dayToday = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,20 +25,51 @@ class _HomePageState extends State<HomePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(
-                    'Welcome to the Health Tracker App... ',
-                    textAlign: TextAlign.center,
+                  Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Welcome to the Health Tracker App... ',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 24),
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Text('Need to display full data'),
+                      Checkbox(
+                          value: needToShowAllData,
+                          onChanged: (value) {
+                            setState(() {
+                              needToShowAllData = value;
+
+                              _list.clear();
+                            });
+                            readData();
+                          }),
+                    ],
                   ),
                   RaisedButton(
                     onPressed: () async {
-                      // await read();
-                      // await readLast();
                       setState(() {
                         _list.clear();
+                        dayToday = false;
                       });
-                      readAll();
+
+                      readData();
                     },
-                    child: Text('Click Me'),
+                    child: Text('Click Me For yesterday\'s Data.'),
+                  ),
+                  RaisedButton(
+                    onPressed: () async {
+                      setState(() {
+                        _list.clear();
+                        dayToday = true;
+                      });
+
+                      readData();
+                    },
+                    child: Text('Click Me For Today\'s Data.'),
                   ),
                   if (_list.length > 0) ..._list
                 ],
@@ -48,7 +81,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void read() async {
+  Future<bool> readPermissions() async {
     try {
       final responses = await FitKit.hasPermissions([
         DataType.HEART_RATE,
@@ -63,7 +96,7 @@ class _HomePageState extends State<HomePage> {
         DataType.EXERCISE_TIME,
       ]);
       if (!responses) {
-        await FitKit.requestPermissions([
+        final value = await FitKit.requestPermissions([
           DataType.HEART_RATE,
           DataType.STEP_COUNT,
           DataType.HEIGHT,
@@ -75,20 +108,52 @@ class _HomePageState extends State<HomePage> {
           DataType.STAND_TIME,
           DataType.EXERCISE_TIME,
         ]);
+
+        return value;
+      } else {
+        return true;
       }
     } on UnsupportedException catch (e) {
       // thrown in case e.dataType is unsupported
       print(e);
+      return false;
     }
   }
 
-  void readAll() async {
-    if (await FitKit.requestPermissions(DataType.values)) {
+  void readData() async {
+    bool permissionsGiven = await readPermissions();
+
+    if (permissionsGiven) {
+      DateTime current = DateTime.now();
+      DateTime dateFrom;
+      DateTime dateTo;
+      if (!dayToday) {
+        dateFrom = DateTime.now().subtract(Duration(
+          hours: current.hour + 24,
+          minutes: current.minute,
+          seconds: current.second,
+        ));
+        dateTo = dateFrom.add(Duration(
+          hours: 23,
+          minutes: 59,
+          seconds: 59,
+        ));
+      } else {
+        dateFrom = current.subtract(Duration(
+          hours: current.hour,
+          minutes: current.minute,
+          seconds: current.second,
+        ));
+        dateTo = DateTime.now();
+      }
+
       for (DataType type in DataType.values) {
         try {
-          final results = await FitKit.read(type,
-              dateFrom: DateTime.now().subtract(Duration(hours: 35)),
-              dateTo: DateTime.now());
+          final results = await FitKit.read(
+            type,
+            dateFrom: dateFrom,
+            dateTo: dateTo,
+          );
 
           print(type);
           print(results);
@@ -155,8 +220,11 @@ class _HomePageState extends State<HomePage> {
   static List<T> map<T>({@required List list, @required Function handler}) {
     List<T> result = [];
 
+    int lengthToDisplay =
+        list.length > 5 && !needToShowAllData ? 5 : list.length;
+
     if (list.length > 0) {
-      for (var i = 0; i < (list.length > 10 ? 5 : list.length); i++) {
+      for (var i = 0; i < lengthToDisplay; i++) {
         result.add(handler(i, list[i]));
       }
     }
