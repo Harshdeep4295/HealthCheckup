@@ -95,6 +95,7 @@ class _HomePageState extends State<HomePage> {
         DataType.STAND_TIME,
         DataType.EXERCISE_TIME,
       ]);
+
       if (!responses) {
         final value = await FitKit.requestPermissions([
           DataType.HEART_RATE,
@@ -166,6 +167,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   void addWidget(DataType type, List<FitData> data) {
+    if (type == DataType.STEP_COUNT) {
+      int total = 0;
+      for (FitData datasw in data) {
+        total += datasw.value;
+      }
+      print("-------------------------- $total");
+    }
     Widget widget = Padding(
         padding: EdgeInsets.all(8.0),
         child: Column(
@@ -247,7 +255,7 @@ class _HomePageState extends State<HomePage> {
       case DataType.ENERGY:
         return 'kilocalorie';
       case DataType.WATER:
-        return 'liter';
+        return 'litre';
       case DataType.SLEEP:
         return 'Sleep';
       default:
