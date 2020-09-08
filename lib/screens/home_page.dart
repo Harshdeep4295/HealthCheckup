@@ -21,58 +21,77 @@ class _HomePageState extends State<HomePage> {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Container(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Align(
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Welcome to the Health Tracker App... ',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 24),
+            child: NotificationListener<OverscrollIndicatorNotification>(
+              onNotification: (overscroll) {
+                overscroll.disallowGlow();
+              },
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Welcome to the Health Tracker App... ',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 24),
+                      ),
                     ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      Text('Need to display full data'),
-                      Checkbox(
-                          value: needToShowAllData,
-                          onChanged: (value) {
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        Text('Need to display full data'),
+                        Checkbox(
+                            value: needToShowAllData,
+                            onChanged: (value) {
+                              setState(() {
+                                needToShowAllData = value;
+
+                                _list.clear();
+                              });
+                              readData();
+                            }),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        RaisedButton(
+                          onPressed: () async {
                             setState(() {
-                              needToShowAllData = value;
-
                               _list.clear();
+                              dayToday = false;
                             });
+
                             readData();
-                          }),
-                    ],
-                  ),
-                  RaisedButton(
-                    onPressed: () async {
-                      setState(() {
-                        _list.clear();
-                        dayToday = false;
-                      });
+                          },
+                          child: Text(
+                            'Click Me For yesterday\'s Data.',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ),
+                        RaisedButton(
+                          onPressed: () async {
+                            setState(() {
+                              _list.clear();
+                              dayToday = true;
+                            });
 
-                      readData();
-                    },
-                    child: Text('Click Me For yesterday\'s Data.'),
-                  ),
-                  RaisedButton(
-                    onPressed: () async {
-                      setState(() {
-                        _list.clear();
-                        dayToday = true;
-                      });
-
-                      readData();
-                    },
-                    child: Text('Click Me For Today\'s Data.'),
-                  ),
-                  if (_list.length > 0) ..._list
-                ],
+                            readData();
+                          },
+                          child: Text(
+                            'Click Me For Today\'s Data.',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    if (_list.length > 0) ..._list
+                  ],
+                ),
               ),
             ),
           ),
