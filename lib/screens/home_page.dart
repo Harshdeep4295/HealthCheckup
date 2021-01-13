@@ -54,34 +54,42 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        RaisedButton(
-                          onPressed: () async {
-                            setState(() {
-                              _list.clear();
-                              dayToday = false;
-                            });
+                        Expanded(
+                          child: RaisedButton(
+                            onPressed: () async {
+                              setState(() {
+                                _list.clear();
+                                dayToday = false;
+                              });
 
-                            readData();
-                          },
-                          child: Text(
-                            'Click Me For yesterday\'s Data.',
-                            style: TextStyle(fontSize: 12),
+                              readData();
+                            },
+                            child: Text(
+                              'Click Me For yesterday\'s Data.',
+                              style: TextStyle(fontSize: 12),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                         ),
-                        RaisedButton(
-                          onPressed: () async {
-                            setState(() {
-                              _list.clear();
-                              dayToday = true;
-                            });
+                        SizedBox(
+                          width: 20,
+                        ),
+                        Expanded(
+                          child: RaisedButton(
+                            onPressed: () async {
+                              setState(() {
+                                _list.clear();
+                                dayToday = true;
+                              });
 
-                            readData();
-                          },
-                          child: Text(
-                            'Click Me For Today\'s Data.',
-                            style: TextStyle(fontSize: 12),
+                              readData();
+                            },
+                            child: Text(
+                              'Click Me For Today\'s Data.',
+                              style: TextStyle(fontSize: 12),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                         ),
                       ],
