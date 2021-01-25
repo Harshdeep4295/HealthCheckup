@@ -167,6 +167,7 @@ class _HomePageState extends State<HomePage> {
           seconds: 59,
         ));
       } else {
+        // 17 Jan 2021 12:53:64 - 12:53:5
         dateFrom = current.subtract(Duration(
           hours: current.hour,
           minutes: current.minute,
@@ -194,19 +195,28 @@ class _HomePageState extends State<HomePage> {
   }
 
   void addWidget(DataType type, List<FitData> data) {
-    if (type == DataType.STEP_COUNT) {
-      int total = 0;
-      for (FitData datasw in data) {
-        total += datasw.value;
-      }
-      print("-------------------------- $total");
+    int total = 0;
+
+    for (FitData datasw in data) {
+      total += datasw.value.toInt();
     }
+    print("-------------------------- $total");
+
     Widget widget = Padding(
         padding: EdgeInsets.all(8.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text('$type'),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text('DataType -  $type '),
+                  Text('Total Value - $total ')
+                ],
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: (data.length > 0)
