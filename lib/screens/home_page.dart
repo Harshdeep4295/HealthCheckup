@@ -209,7 +209,7 @@ class _HomePageState extends State<HomePage> {
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Row(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Text('DataType -  $type '),
@@ -245,6 +245,12 @@ class _HomePageState extends State<HomePage> {
                                     Expanded(
                                       child: Text(
                                         '${datas.value is double ? datas.value.toStringAsFixed(1) : datas.value} ${getBaseUnit(type)}',
+                                        softWrap: true,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        datas.source.toString(),
                                         softWrap: true,
                                       ),
                                     )
